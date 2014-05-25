@@ -14,13 +14,13 @@ class CreateUserInformationTable extends Migration {
 	{	
 		Schema::create('UserInformation',function($table)
 		{
-			$table->incretment('UserID');
+			$table->increment('UserID');
 			$talbe->string('Username');
 			$talbe->string('Userpasswd');
 			$table->string('Nickname');
 			$talbe->string('Realname');
 			$talbe->string('Birthday');
-		}
+		});
 	}
 
 	/**
