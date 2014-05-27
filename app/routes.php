@@ -13,7 +13,15 @@
 
 Route::get('/', function()
 {
-	return View::make('hello');
+	//return View::make('hello');
+	return 123;
 });
 
+/*
+Route::get('users',function()
+{
+	return 'users';
+});
+*/
 
+Route::controller('users', 'UserController');
