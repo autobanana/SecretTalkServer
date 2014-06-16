@@ -10,11 +10,11 @@ class UserController extends BaseController {
 
 	public function getCreate()
 	{
-		if(Request::isJson())
+		if(Input::has('request'))
 		{	
 			$request=Input::get('request');
 			
-			$request=json_decode($request);	
+			$request=json_decode($request,true);	
 			
 			$username=$request['username'];
 			$password=$request['password'];
@@ -27,14 +27,14 @@ class UserController extends BaseController {
 					||$birthday==null
 			  )	
 				return Response::json(array(
-							'Result'=>'-1',
+							'Response'=>'-1',
 							'Message'=>'Lost Input'
 							));
 
 			$count=User::where('Username','=',$username)->count();		
 			if($count>0)
 				return Response::json(array(
-							'Result'=>'-1',
+							'Response'=>'-1',
 							'Message'=>'User Exist'
 							));
 
@@ -47,14 +47,14 @@ class UserController extends BaseController {
 			$user->save();	
 
 			return Response::json(array(
-						'Result'=>'0',
-						'Messague'=>'Register Success'
+						'Response'=>'0',
+						'Message'=>'Register Success'
 						));			
 		}
 		else
 		{
 			return Response::json(array(
-						'Resutl'=>'-1',
+						'Response'=>'-1',
 						'Message'=>'Input Format Error'
 						));
 

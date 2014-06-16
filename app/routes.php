@@ -24,4 +24,6 @@ Route::get('users',function()
 });
 */
 
-Route::controller('users', 'UserController');
+Route::controller('users' , 'UserController');
+
+Route::controller('article' , 'ArticleController');
