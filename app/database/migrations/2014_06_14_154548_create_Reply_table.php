@@ -17,6 +17,8 @@ class CreateReplyTable extends Migration {
 			$table->string('article_id');
 			$table->string('author_id');
 			$table->string('content');
+			$table->integer('status')->default(0);
+			$table->timestamps();
 			
 		});
 	}

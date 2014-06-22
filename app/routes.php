@@ -14,7 +14,15 @@
 Route::get('/', function()
 {
 	//return View::make('hello');
-	return 123;
+	$users=UserPreference::where('Gender','=','boy1')
+		->orderBy(DB::raw('RAND()'))
+		->get();
+	$target_user=null;
+	foreach($users as $user)
+	{
+		$target_user=$user->Username;
+	}
+	return $target_user;
 });
 
 /*
@@ -27,3 +35,7 @@ Route::get('users',function()
 Route::controller('users' , 'UserController');
 
 Route::controller('article' , 'ArticleController');
+
+Route::controller('reply', 'ReplyController');
+
+
