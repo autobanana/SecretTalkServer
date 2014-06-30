@@ -17,8 +17,13 @@ class ArticleController extends BaseController {
 			$request=json_decode($request,true);
 			$username=$request['username'];
 			
-			$result= Article::where('author_id','=',$username)->get();
-			return $result->toJson();
+			$result= Article::where('author_id','=',$username)
+					->orderBy('created_at','desc')
+					->get();
+			return Response::json(array(
+						'Response'=>0,
+						'Message'=>'Get Article Finish',
+						'ArticleList'=>$result->toJson()));
 			
 
 		}
@@ -73,7 +78,7 @@ class ArticleController extends BaseController {
 
 	}
 	
-	public function getNewArticle()
+	public function getNewarticle()
 	{
 		if(Input::has('request'))
 		{
@@ -103,11 +108,14 @@ class ArticleController extends BaseController {
 					$article['content']=$unreplyArticle->content;
 					break;
 				}
+				
+				$article_content=Article::where('id','=',$article['article_id'])
+						->get();
 
 				return Response::json(array(
 							'Response'=>'0',
 							'Message'=>'Unreply Article Found',
-							'Artilce'=>$article
+							'Article'=>$article_content->toJson()
 							));
 			}
 			
@@ -126,8 +134,8 @@ class ArticleController extends BaseController {
 			
 			//Select A Random User whose Preference Fit this Profile
 			$target_user_lists=UserPreference::where('Gender','=',$UserProfile->Gender)
-						->orWhere('BloodType','=',$UserProfile->BloodType)
-						->orWhere('Sign','=',$UserProfile->Sign)
+						//->orWhere('BloodType','=',$UserProfile->BloodType)
+						//->orWhere('Sign','=',$UserProfile->Sign)
 						->orderBy(DB::raw('RAND()'))
 						->get();
 			if($target_user_lists->count()==0)
@@ -141,11 +149,11 @@ class ArticleController extends BaseController {
 			
 			//Use the list to find article
 			$target_user=null;
-			foreach($targer_user_lists as $user)
+			foreach($target_user_lists as $user)
 			{
 				//Get Article
 				$article=Article::where('author_id','=',$user->Username)->first();
-				if($article!=null)
+				if($article!=null && $user->Username!=$username)
 				{
 					$target_user=$user->Username;
 					break;
@@ -168,11 +176,12 @@ class ArticleController extends BaseController {
 			$reply->status=0;		
 			$reply->save();
 			
+			$NewArticleList[0]=$article->toJson();
 			//Return Article
 			return Response::json(array(
 						'Response'=>'0',
 						'Message'=>'Get New Article',
-						'Article'=>$article
+						'Article'=>json_encode($NewArticleList)
 						));
 						
 			

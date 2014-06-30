@@ -37,8 +37,16 @@ class CreateUserSettingTable extends Migration {
 		{
 				
 			$table->string('Username');
-			$table->string('Gender');
-			$table->string('BloodType');
+			$table->enum('Gender',array(
+						'male',
+						'female'
+						));
+			$table->enum('BloodType',array(
+						'A',
+						'B',
+						'AB',
+						'O'
+						));
 			$table->enum('Sign',array(
 					'Aries',
 					'Taurus',

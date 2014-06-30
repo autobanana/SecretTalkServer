@@ -21,6 +21,11 @@ class UserController extends BaseController {
 			$nickname=$request['nickname'];
 			$realname=$request['realname'];	
 			$birthday=$request['birthday'];
+	
+			$sign=$request['sign'];			
+			$gender=$request['gender'];
+			$bloodType=$request['bloodType'];
+			
 
 			if($username==null||$password==null
 					||$nickname==null||$realname==null
@@ -45,7 +50,14 @@ class UserController extends BaseController {
 			$user->Realname=$realname;
 			$user->Birthday=$birthday;
 			$user->save();	
-
+			
+			$userProfile=new UserProfile;
+			$userProfile->Username=$username;
+			$userProfile->Gender=$gender;
+			$userProfile->Sign=$sign;
+			$userProfile->BloodType=$bloodType;		
+			$userProfile->save();
+	
 			return Response::json(array(
 						'Response'=>'0',
 						'Message'=>'Register Success'
@@ -78,7 +90,8 @@ class UserController extends BaseController {
 			{
 				return Response::json(array(
 							'Response'=>'0',
-							'Message'=>'Login Success'
+							'Message'=>'Login Success',
+							'Username'=>$username
 							));
 			}
 			else
@@ -94,7 +107,7 @@ class UserController extends BaseController {
 		{
 			return Response::json(array(
 						'Respone'=>'-1',
-						'Message'=>'Input Format Error'
+						'Message'=>'Input Format Error',						
 						));
 		}
 
@@ -105,6 +118,53 @@ class UserController extends BaseController {
 	{
 
 		
+	}
+	
+	public function getSetpreference()
+	{
+		if(Input::has('request'))
+		{
+			$request=Input::get('request');
+			$request=json_decode($request,true);
+			
+			$username=$request['username'];
+			$gender=$request['gender'];
+			$bloodType=$request['bloodType'];
+			$sign=$request['sign'];
+			
+			$UserPreferences=UserPreference::where('Username','=',$username)
+					->get();
+
+			if($UserPreferences->count()!=0)
+			{
+				$UserPreference=$UserPreferences->first();
+			}
+			
+			else
+			{
+				$UserPreference=new UserPreference;
+			}
+					
+			$UserPreference->Username=$username;
+			$UserPreference->Gender=$gender;
+			$UserPreference->BloodType=$bloodType;
+			$UserPreference->Sign=$sign;			
+			
+			$UserPreference->save();
+
+			return Response::json(array(
+						'Response'=>'0',
+						'Message'=>'Save Preference Success'
+						));
+		}
+		else
+		{
+			
+			return Response::json(array(
+						'Respone'=>'-1',
+						'Message'=>'Input Format Error'));
+		}
+
 	}
 	
 

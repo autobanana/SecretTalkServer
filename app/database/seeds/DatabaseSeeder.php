@@ -1,17 +1,27 @@
 <?php
+class DatabaseSeeder extends Seeder{
 
-class DatabaseSeeder extends Seeder {
-
-	/**
-	 * Run the database seeds.
-	 *
-	 * @return void
-	 */
 	public function run()
 	{
 		Eloquent::unguard();
 
-		// $this->call('UserTableSeeder');
+		$this->command->info('Start Seed User Information');
+		
+		$faker=Faker\Factory::create();
+		for($i=0;$i<100;$i++)
+		{
+			$user=User::create(array(
+				'Username'=>$faker->userName,
+				'Userpasswd'=>$faker->word,
+				'Nickname'=>$faker->name,
+				'Realname'=>$faker->name
+				
+				));
+
+		}
+		
 	}
+
+
 
 }

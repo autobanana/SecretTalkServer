@@ -14,15 +14,14 @@
 Route::get('/', function()
 {
 	//return View::make('hello');
-	$users=UserPreference::where('Gender','=','boy1')
+	$users=UserPreference::where('Gender','=','boy')
 		->orderBy(DB::raw('RAND()'))
-		->get();
-	$target_user=null;
-	foreach($users as $user)
-	{
-		$target_user=$user->Username;
-	}
-	return $target_user;
+		->first();
+	
+	return Response::json(array(
+				'result'=>'-1',
+				'user'=>$users->toJson()
+				));
 });
 
 /*
