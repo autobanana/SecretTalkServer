@@ -13,15 +13,11 @@
 
 Route::get('/', function()
 {
-	//return View::make('hello');
-	$users=UserPreference::where('Gender','=','boy')
-		->orderBy(DB::raw('RAND()'))
-		->first();
-	
-	return Response::json(array(
-				'result'=>'-1',
-				'user'=>$users->toJson()
-				));
+
+	$reply=Reply::where('created_at','>',new DateTime('2014-07-02 04:00:00'))
+			->get();	
+
+	return $reply->toJson();	
 });
 
 /*
