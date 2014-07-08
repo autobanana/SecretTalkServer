@@ -13,11 +13,14 @@
 
 Route::get('/', function()
 {
+	$UserProfile=UserProfile::where('Username','=','secrettalk')
+				->first();
+	$UserInformation=User::where('Username','=','secrettalk')
+				->first();
 
-	$reply=Reply::where('created_at','>',new DateTime('2014-07-02 04:00:00'))
-			->get();	
+	$UserProfile->Birthday=$UserInformation->Birthday;
+	return $UserProfile->toJson();
 
-	return $reply->toJson();	
 });
 
 /*

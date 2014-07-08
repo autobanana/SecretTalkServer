@@ -1,6 +1,5 @@
 <?php
 
-
 class UserController extends BaseController {
 
 	public function getIndex()
@@ -119,8 +118,48 @@ class UserController extends BaseController {
 
 		
 	}
+
+	public function getUserprofile()
+	{
+		if(Input::has('request'))
+		{
+			$request=Input::get('request');	
+			$request=json_encode($request,true);
+			
+			$username=$request['username'];
 	
-	public function getSetpreference()
+			$UserProfile=UserProfile::where('Username','=',$username)
+						->first();
+			$UserInformation=User::where('Username','=',$username)
+						->first();
+			if($UserProfile==null)
+			{
+				
+			}
+
+			else
+			{	
+
+				$UserProfile->Birthday=$UserInformation->Birthday;
+							
+				return Response::json(array(
+						'Respone'=>'0',
+						'Message'=>'Get User Profile Success',
+						'UserProfile'=>$UserProfile->toJson()		
+						));
+
+			}
+			
+		}
+		else
+		{
+			return Response::json(array(
+						'Respone'=>'-1',
+						'Message'=>'Input Format Error'));
+		}
+
+	}	
+	public function getSetprofile()
 	{
 		if(Input::has('request'))
 		{
@@ -128,27 +167,28 @@ class UserController extends BaseController {
 			$request=json_decode($request,true);
 			
 			$username=$request['username'];
-			$gender=$request['gender'];
-			$bloodType=$request['bloodType'];
-			$sign=$request['sign'];
+			$mood=$request['mood'];
+			$interest=$request['interest'];
+			$personality=$request['personality'];
 			
-			$UserPreferences=UserPreference::where('Username','=',$username)
+			$UserProfile=UserProfile::where('Username','=',$username)
 					->get();
 
-			if($UserPreferences->count()!=0)
+			if($UserProfile->count()!=0)
 			{
-				$UserPreference=$UserPreferences->first();
+				$UserProfile=$UserProfile->first();
 			}
 			
 			else
 			{
-				$UserPreference=new UserPreference;
+				$UserProfile=new UserProfile;
+				$UserProfile->Username=$username;
 			}
 					
-			$UserPreference->Username=$username;
-			$UserPreference->Gender=$gender;
-			$UserPreference->BloodType=$bloodType;
-			$UserPreference->Sign=$sign;			
+			
+			$UserProfile->Mood=$mood;
+			$UserProfile->Interest=$interest;
+			$UserProfile->Personality=$personality;
 			
 			$UserPreference->save();
 
