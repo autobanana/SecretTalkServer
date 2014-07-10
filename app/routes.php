@@ -13,13 +13,14 @@
 
 Route::get('/', function()
 {
-	$UserProfile=UserProfile::where('Username','=','secrettalk')
-				->first();
-	$UserInformation=User::where('Username','=','secrettalk')
-				->first();
-
-	$UserProfile->Birthday=$UserInformation->Birthday;
-	return $UserProfile->toJson();
+	
+	$user=User::where('username','=','abc')
+		->first();
+	$time=strtotime($user->created_at);
+	$dt=time();
+	$datediff = $dt - $time;
+	
+	return floor($datediff/(60*60*24));
 
 });
 
@@ -36,4 +37,4 @@ Route::controller('article' , 'ArticleController');
 
 Route::controller('reply', 'ReplyController');
 
-
+Route::controller('match','MatchController');
