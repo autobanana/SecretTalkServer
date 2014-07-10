@@ -20,6 +20,16 @@ class ArticleController extends BaseController {
 			$result= Article::where('author_id','=',$username)
 				->orderBy('created_at','desc')
 				->get();
+			
+				
+			$user=UserProfile::where('username','=',$username)
+				->first();
+
+			foreach($result as $entity)
+			{
+				$entity->level=$user->Level;
+			}
+
 			return Response::json(array(
 						'Response'=>0,
 						'Message'=>'Get Article Finish',
@@ -104,7 +114,18 @@ class ArticleController extends BaseController {
 
 			foreach($MatchArticles as $MatchArticle)
 			{
-				$NewArticleList[]=$MatchArticle;
+				//$NewArticleList[]=$MatchArticle->toJson();
+				$Article=Article::where('id','=',$MatchArticle->article_id)
+					->first();
+			
+				$u_Profile=UserProfile::where('username','=',$Article->author_id)
+						->first();
+				
+				$Article->level=$u_Profile->Level;				
+
+				
+				$NewArticleList[]=$Article->toJson();
+				
 			}			
 
 
@@ -113,7 +134,7 @@ class ArticleController extends BaseController {
 
 			}
 			else
-			{
+			{	
 				//Get User Profile
 				$UserProfiles=UserProfile::where('Username','=',$username)
 					->get();	
@@ -136,7 +157,7 @@ class ArticleController extends BaseController {
 					->orWhere('Mood','=',$UserProfile->Mood)
 					->orderBy(DB::raw('RAND()'))
 					->get();
-
+				
 				if($target_user_lists->count()==0&&count($NewArticleList)==0)
 				{
 					return Response::json(array(
@@ -148,25 +169,49 @@ class ArticleController extends BaseController {
 
 				if($target_user_lists->count()!=0)
 				{
-					
+						
+					//Get How Many Article Need
 					$article_count=5-$MatchArticles->count();
+					
 					foreach($target_user_lists as $user)
 					{	
 						//Get Article
 						$article=Article::where('author_id','=',$user->Username)->first();
+
+							
 						if($article!=null && $user->Username!=$username)
 						{	
+							//Check Whether the article exist or not 
+							$CheckMatch=Match::where('article_id','=',$article->id)
+									->where('status','=','0')
+									->get();
 							
-							$match=new Match;
-							$match->article_id=$article->id;
-							$match->username=$username;
-							$match->status=0;
-							$match->save();
-	
-							$NewArticleList[]=$article->toJson();
-							$article_count++;
-							if($article_count==5)
-								break;
+							//Check has matched or not
+							$CheckHasMatch=Match::where('article_id','=',$article->id)
+									->where('username','=',$username)
+									->get();
+									
+							
+							if($CheckMatch->count()==0&&$CheckHasMatch->count()==0)
+							{	
+								//Add New Match Record							
+								$match=new Match;
+								$match->article_id=$article->id;
+								$match->username=$username;
+								$match->status=0;
+								$match->save();
+
+								//Get User Level Property
+								$eachUserProfile=UserProfile::where('username','=',$user->Username)
+									->first();
+								$article->level=$eachUserProfile->Level;
+
+								//Add to NewArticle List
+								$NewArticleList[]=$article->toJson();
+								$article_count++;
+								if($article_count==5)
+									break;
+							}
 						}			
 					}
 

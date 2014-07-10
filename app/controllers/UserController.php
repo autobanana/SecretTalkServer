@@ -7,7 +7,7 @@ class UserController extends BaseController {
 		return "123";
 	}
 
-	public function getCreate()
+	public function anyCreate()
 	{
 		if(Input::has('request'))
 		{	
@@ -72,7 +72,7 @@ class UserController extends BaseController {
 		}
 	}
 
-	public function getLogin()
+	public function anyLogin()
 	{
 		if(Input::has('request'))
 		{
@@ -87,10 +87,17 @@ class UserController extends BaseController {
 				   ->count();
 			if($count==1)
 			{
+				$token=new Token;
+				$token->username=$username;
+				$token_pass=substr(md5(rand()),0,31);
+				$token->token=$token_pass;
+				$token->save();
+				
 				return Response::json(array(
 							'Response'=>'0',
 							'Message'=>'Login Success',
-							'Username'=>$username
+							'Username'=>$username,
+							'Token'=>$token_pass
 							));
 			}
 			else
@@ -124,7 +131,7 @@ class UserController extends BaseController {
 		if(Input::has('request'))
 		{
 			$request=Input::get('request');	
-			$request=json_encode($request,true);
+			$request=json_decode($request,true);
 			
 			$username=$request['username'];
 	
@@ -132,6 +139,7 @@ class UserController extends BaseController {
 						->first();
 			$UserInformation=User::where('Username','=',$username)
 						->first();
+				
 			if($UserProfile==null)
 			{
 				
@@ -139,13 +147,31 @@ class UserController extends BaseController {
 
 			else
 			{	
+				$R_UserProfile['Gender']=$UserProfile->Gender;
+				$R_UserProfile['BloodType']=$UserProfile->BloodType;
+				$R_UserProfile['Sign']=$UserProfile->Sign;
+				$R_UserProfile['Interest']=$UserProfile->Interest;
+				$R_UserProfile['Personality']=$UserProfile->Personality;
+				$R_UserProfile['Level']=$UserProfile->Level;
+				$R_UserProfile['Score']=$UserProfile->Score;
+				$R_UserProfile['Mood']=$UserProfile->Mood;		
+			
+				$R_UserProfile['Birthday']=$UserInformation->Birthday;
+				$R_UserProfile['Nickname']=$UserInformation->Nickname;
+				$R_UserProfile['created_at']=$UserInformation->created_at;
+				
+				$CreateTime=strtotime($UserInformation->created_at);
+				$NowTime=time();
+				$LoginDays=$NowTime-$CreateTime;
+				
+				$LoginDays=floor($LoginDays/(60*60*24));
 
-				$UserProfile->Birthday=$UserInformation->Birthday;
-							
+				$R_UserProfile['LoginDays']=$LoginDays;
+
 				return Response::json(array(
-						'Respone'=>'0',
+						'Response'=>'0',
 						'Message'=>'Get User Profile Success',
-						'UserProfile'=>$UserProfile->toJson()		
+						'UserProfile'=>json_encode($R_UserProfile)
 						));
 
 			}
@@ -158,7 +184,8 @@ class UserController extends BaseController {
 						'Message'=>'Input Format Error'));
 		}
 
-	}	
+	}
+	
 	public function getSetprofile()
 	{
 		if(Input::has('request'))
@@ -171,12 +198,12 @@ class UserController extends BaseController {
 			$interest=$request['interest'];
 			$personality=$request['personality'];
 			
-			$UserProfile=UserProfile::where('Username','=',$username)
+			$UserProfiles=UserProfile::where('Username','=',$username)
 					->get();
 
-			if($UserProfile->count()!=0)
+			if($UserProfiles->count()!=0)
 			{
-				$UserProfile=$UserProfile->first();
+				$UserProfile=$UserProfiles->first();
 			}
 			
 			else
@@ -190,7 +217,7 @@ class UserController extends BaseController {
 			$UserProfile->Interest=$interest;
 			$UserProfile->Personality=$personality;
 			
-			$UserPreference->save();
+			$UserProfile->save();
 
 			return Response::json(array(
 						'Response'=>'0',

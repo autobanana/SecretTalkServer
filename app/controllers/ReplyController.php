@@ -44,11 +44,33 @@ class ReplyController extends BaseController {
 						->where('created_at','>',new DateTime($timeStamps))
 						->orderBy('created_at')
 						->get();
-			}	
+			}
+
+			$replyList=[];
+			foreach($reply as $entity)
+			{
+				$newReply=null;
+				$newReply['id']=$entity->id;
+				$newReply['article_id']=$entity->article_id;
+				$newReply['author_id']=$entity->author_id;
+				$newReply['content']=$entity->content;
+				$newReply['status']=$entity->status;
+				
+				$newReply['created_at']=date("Y-m-d H:i:s",strtotime($entity->created_at));
+
+				$author=UserProfile::where('Username','=',$entity->author_id)
+					->first();
+				
+				$newReply['level']=$author->Level;
+
+				$replyList[]=$newReply;
+				
+			}
+	
 			return Response::json(array(
 						'Response'=>'0',
 						'Message'=>'Get Reply Success',
-						'ReplyList'=>$reply->toJson()
+						'ReplyList'=>json_encode($replyList)
 					));
 			
 		}
