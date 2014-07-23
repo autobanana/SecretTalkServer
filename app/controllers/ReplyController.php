@@ -24,7 +24,16 @@ class ReplyController extends BaseController {
 				$timeStamps=$request['timeStamps'];
 			else
 				$timeStamps=null;
-	
+
+			if(array_key_exists('current_time',$request))
+			{
+				$currentTime=$request['current_time'];
+			}
+			else
+			{
+				$currentTime=null;
+			}
+
 			if($article_id==null||$username==null)
 			{
 				return Response::json(array(
@@ -63,10 +72,37 @@ class ReplyController extends BaseController {
 				
 				$newReply['level']=$author->Level;
 
+				$authorInformation=User::where('Username','=',$entity->author_id)
+						->first();
+
+				$newReply['nickname']=$authorInformation->Nickname;
+
 				$replyList[]=$newReply;
 				
 			}
-	
+
+			$replyReads=ReplyRead::where('article_id','=',$article_id)
+					->where('username','=',$username)
+					->get();
+			$date = date('Y/m/d H:i:s');
+			if($replyReads->count()==0)
+			{
+				$replyRead=new ReplyRead;
+				$replyRead->article_id=$article_id;	
+				$replyRead->username=$username;
+				$replyRead->readtime=$date;
+				$replyRead->save();
+			}
+			else
+			{
+				$replyRead=$replyReads->first();
+				$replyRead->readtime=$date;
+				$replyRead->save();
+
+
+			}	
+			
+		
 			return Response::json(array(
 						'Response'=>'0',
 						'Message'=>'Get Reply Success',

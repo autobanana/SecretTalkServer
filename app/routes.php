@@ -14,13 +14,11 @@
 Route::get('/', function()
 {
 	
-	$user=User::where('username','=','abc')
+	$user=User::where('username','=','dodo')
+		->get()
 		->first();
-	$time=strtotime($user->created_at);
-	$dt=time();
-	$datediff = $dt - $time;
 	
-	return floor($datediff/(60*60*24));
+	return $user->toJson(); 
 
 });
 
@@ -38,3 +36,7 @@ Route::controller('article' , 'ArticleController');
 Route::controller('reply', 'ReplyController');
 
 Route::controller('match','MatchController');
+
+Route::controller('announcement','AnnouncementController');
+
+Route::controller('manage','ManageController');
